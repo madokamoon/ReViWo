@@ -1,0 +1,95 @@
+defaults:
+  # training config
+  load_train_data_path: "./data/metaworld"
+  log_dir: none
+  load_ckpt_path: none
+
+  num_epoch: 100000
+  batch_size: 8
+  camera_num: 8
+  loss_form: "Weighted_MSE"
+  fusion_style: "plus"
+  img_size: 128
+  patch_size: 16
+  seed: 42
+
+  log_step: 100
+  vis_step: 2000
+  save_step: 2000
+  eval_step: 2000
+
+  vq_coef: 0.25
+  shuffled_v_coef: 2
+  shuffled_l_coef: 2
+  shuffled_vl_coef: 2
+  latent_consistency_coef: 0.5
+  view_consistency_coef: 0.1
+  latent_contrastive_coef: 0.5
+  view_contrastive_coef: 0.1
+  temperature: 0.25
+
+  use_latent_vq: True
+  is_latent_ae: False
+  use_view_vq: False
+  is_view_ae: False
+
+  # model config
+  view_encoder_config: {
+    block_size: 256,
+    vocab_size: 512,
+    n_tokens_per_frame: 256,
+    n_layer: 8,
+    n_head: 8,
+    n_embed: 128,
+    dropout: 0.1, 
+    bias: False,
+    mask_rate: 0
+  }
+
+  latent_encoder_config: {
+    block_size: 256,
+    vocab_size: 512,
+    n_tokens_per_frame: 256,
+    n_layer: 8,
+    n_head: 8,
+    n_embed: 128,
+    dropout: 0.1, 
+    bias: False,
+    mask_rate: 0
+  }
+
+  decoder_config: {
+    block_size: 256,
+    vocab_size: 512,
+    n_tokens_per_frame: 256,
+    n_layer: 8,
+    n_head: 8,
+    n_embed: 128,
+    dropout: 0.1, 
+    bias: False,
+    mask_rate: 0
+  }
+
+  view_cb_config: {
+    embed_dim: 64, 
+    n_embed: 64,
+    beta: 0.25
+  }
+
+  latent_cb_config: {
+    embed_dim: 64, 
+    n_embed: 512,
+    beta: 0.25
+  }
+
+  # Optimizer config
+  optimizer: {
+    lr: 0.0003,
+    final_lr: 0.00003,
+    lr_num_step: 100000
+  }
+
+  # Base trainer config
+  trainer: {
+    batch_size: 1
+  }
