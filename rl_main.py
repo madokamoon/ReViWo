@@ -77,22 +77,14 @@ def get_args():
     
     parser.add_argument("--load_raw_data_path", 
         type=str, 
-        # default="/home/pangjc/tangn/multi_view/data/world_model_training/traj_{env_name}.pkl",
         default=project_dir + "/data/world_model_training/traj_{env_name}.pkl", 
         help="The load dir of the raw image data"
         )
     
     parser.add_argument("--save_preprocessed_data_path", 
         type=str, 
-        # default="/home/pangjc/tangn/multi_view/data/world_model_training/traj_latent_embedding_{env_name}_v0.pkl",
-        default=project_dir + "/data/world_model_training/traj_latent_embedding_{env_name}_v0.pkl", 
+        default=project_dir + "/data/world_model_training/traj_latent_embedding_{env_name}_{ckpt_name}.pkl", 
         help="The save dir of data with latent embedding"
-        )
-    
-    parser.add_argument("--rebuild_dataset", 
-        type=bool, 
-        default=False,
-        help="Whether we need to rebuild the latent embedding dataset with the trainer"
         )
     
     parser.add_argument("--use_latent_embedding_data", 
@@ -103,7 +95,7 @@ def get_args():
 
     parser.add_argument("--episode_worker", 
         type=int, 
-        default=1,
+        default=3,
         help="how many episodes each worker should handle"
         )
 
@@ -115,7 +107,7 @@ def get_args():
     
     parser.add_argument("--max_eps_step", 
         type=int, 
-        default=128,
+        default=256,
         help="env max step for an episode"
         )
 
@@ -193,9 +185,9 @@ def get_args():
     parser.add_argument("--real-ratio", type=float, default=0.5)
     parser.add_argument("--load-dynamics-path", type=str, default=None)
 
-    parser.add_argument("--epoch", type=int, default=1000)  # 1000
-    parser.add_argument("--step-per-epoch", type=int, default=1000)
-    parser.add_argument("--eval_episodes", type=int, default=30)  # 10->40->30
+    parser.add_argument("--epoch", type=int, default=5)
+    parser.add_argument("--step-per-epoch", type=int, default=5000)
+    parser.add_argument("--eval_episodes", type=int, default=30)
     parser.add_argument("--batch-size", type=int, default=256)
     parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
 
@@ -205,11 +197,12 @@ def get_args():
 def preprocess_dataset(
     tokenizer: MultiViewTokenizer, 
     env_name: str,
+    ckpt_name: str,
     load_raw_data_path: str,
     save_preprocessed_data_path: str
     ) -> list:
     load_raw_data_path = load_raw_data_path.format(env_name=env_name)
-    save_preprocessed_data_path = save_preprocessed_data_path.format(env_name=env_name)
+    save_preprocessed_data_path = save_preprocessed_data_path.format(env_name=env_name, ckpt_name=ckpt_name)
     with open(load_raw_data_path, "rb") as f:
         raw_data = pickle.load(f)
         
@@ -446,12 +439,13 @@ def main():
 
     mv_embedding_tokenizer = init_tokenizer(args.load_tokenizer_path)
 
-    if (os.path.exists(args.save_preprocessed_data_path.format(env_name=args.env_name)) and not args.rebuild_dataset) or not args.use_latent_embedding_data:
-        with open(args.save_preprocessed_data_path.format(env_name=args.env_name), "rb") as f:
+    ckpt_name = "_".join(args.load_tokenizer_path.split('/')[-3:])
+
+    if os.path.exists(args.save_preprocessed_data_path.format(env_name=args.env_name, ckpt_name=ckpt_name)):
+        with open(args.save_preprocessed_data_path.format(env_name=args.env_name, ckpt_name=ckpt_name), "rb") as f:
             data = pickle.load(f)
     else:
-        assert not (os.path.exists(args.save_preprocessed_data_path.format(env_name=args.env_name)) and args.rebuild_dataset), f'args.rebuild_dataset:{args.rebuild_dataset}, no rebuild'
-        data = preprocess_dataset(mv_embedding_tokenizer, args.env_name, args.load_raw_data_path, args.save_preprocessed_data_path)
+        data = preprocess_dataset(mv_embedding_tokenizer, args.env_name, ckpt_name, args.load_raw_data_path, args.save_preprocessed_data_path)
     offline_dataset = make_mv_data(data, args, args.use_reward_shaping, args.success_only, args.single_camera)
     offline_dataset['rewards'] = offline_dataset['rewards'] / 10
     print("Initialize the offline dataset under the latent space successfully!")

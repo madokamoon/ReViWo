@@ -25,66 +25,15 @@ python collect_data/collect_world_model_training_data.py --env_name ${your_metaw
 ```
 
 2. Running COMBO with the following command. We provide three setting for evaluation:
-* Training: the evaluation viewpoint is the same as the training one
+* Training View: 
 ```bash
-
+python rl_main.py --env_name ${your_metaworld_env_name} --env_mode "normal"
 ``` 
-
-
-
-
-1. Download Llama-2-7b-chat-hf from https://huggingface.co/meta-llama/Llama-2-7b-chat-hf
-2. Move the downloaded Llama-2-7b-chat-hf to path `base_models/llama2-hf-chat-7b`
-3. Move the OfflineRL dataset to path `data/${offlinerl_dataset_name}`. We provide 2 toy datasets for testing: `data/clevr_robot.npy` and `data/meta_world.npy`
-4. Update the `num_processes` parameter to the num of GPUs you want to use in `config/ds_clevr.yaml` and `config/ds_meta.yaml`
-5. Update the paths and `CUDA_VISIBLE_DEVICES` in `scripts/train_clevr.sh` and `scripts/train_meta.sh`
-6. fine-tune the LLM
-* CLEVR-Robot
+* Novel View(CIP): 
 ```bash
-bash scripts/train_clevr.sh
-```
-* Meta-World
+python rl_main.py --env_name ${your_metaworld_env_name} --env_mode "novel" --azimuth ${change_of_azimuth}
+``` 
+* Shaking View(CSH): 
 ```bash
-bash scripts/train_meta.sh
-```
-
-## Rollout Generation
-1. Move the fine-tuned LLM to path `finetuned_models/${model_name}`
-2. Generate rollouts with the fine-tuned LLM
-* CLEVR-Robot
-```bash
-python3 src/clevr_generate.py --model_path ${model_path} --prompt_path ${prompt_path} --output_path ${output_path} --level ${level}
-```
-* Meta-World
-```bash
-python3 src/meta_generate.py --model_path ${model_path} --output_path ${output_path} --level ${level}
-```
-3. We provide 1 toy instruction prompt dataset for testing(Generation on Meta-World does not need dataset): `data/clevr_rephrase_prompt.npy`
-```bash
-python3 src/clevr_generate.py --model_path ${model_path} --prompt_path data/clevr_rephrase_prompt.npy --output_path ${output_path} --level rephrase_level
-```
-* Meta-World
-```bash
-python3 src/meta_generate.py --model_path ${model_path} --output_path ${output_path} --level rephrase_level
-```
-
-## OfflineRL Training
-1. Move the imaginary dataset to path `data/${imaginary_dataset_name}`
-2. Train the OfflineRL policy with the OfflineRL dataset and imaginary datast
-* CLEVR-Robot
-```bash
-python3 src/clevr_offline_train.py --ds_type ${ds_type} --agent_name ${agent_name} --dataset_path ${dataset_path} --device ${device} --seed ${seed}
-```
-* Meta-World
-```bash
-python3 src/meta_offline_train.py --ds_type ${ds_type} --agent_name ${agent_name} --dataset_path ${dataset_path} --device ${device} --seed ${seed}
-```
-3. We provide 2 toy offlineRL datasets for testing: `data/clevr_robot.hdf5` and `data/meta_world.hdf5`
-* CLEVR-Robot
-```bash
-python3 src/clevr_offline_train.py --ds_type rephrase_level --agent_name ${agent_name} --dataset_path data/clevr_robot.hdf5 --device ${device} --seed ${seed}
-```
-* Meta-World
-```bash
-python3 src/meta_offline_train.py --ds_type rephrase_level --agent_name ${agent_name} --dataset_path data/meta_world.hdf5 --device ${device} --seed ${seed}
-```
+python rl_main.py --env_name ${your_metaworld_env_name} --env_mode "novel" --azimuth ${change_of_azimuth}
+``` 

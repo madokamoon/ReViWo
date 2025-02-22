@@ -204,7 +204,6 @@ class MultiViewBetaVAE(nn.Module):
             raise NotImplementedError
 
         
-    @torch.no_grad()
     def visualize(self, x, save_dir=None):
         self.eval()
         if len(x.shape) == 5:
@@ -214,9 +213,11 @@ class MultiViewBetaVAE(nn.Module):
             origin_imgs = x
             B, C, H, W = x.shape
             A = 1
-        z_v_mu, _, z_l, _, encoding_indices = self.encode(x.reshape(B*A, C, H, W), deterministic_view=False)
-        z_v = z_v_mu.clone()
-        xrec = self.decode(z_v, z_l)
+        
+        with torch.no_grad():
+            z_v_mu, _, z_l, _, encoding_indices = self.encode(x.reshape(B*A, C, H, W), deterministic_view=False)
+            z_v = z_v_mu.clone()
+            xrec = self.decode(z_v, z_l)
         
         latent_encoding_indices, view_encoding_indices = encoding_indices
         
@@ -244,80 +245,7 @@ class MultiViewBetaVAE(nn.Module):
                 Image.fromarray(cat_imgs[i]).save(save_dir+f'/vis_{i}.png')
         else:
             return cat_imgs, latent_encoding_indices.cpu().numpy(), view_encoding_indices.cpu().numpy()
-
-    @torch.no_grad()
-    def visualize_three_tuple(self, raw_data, viewdiff_data, latentdiff_data, save_dir=None, device='cuda'):
-        self.eval()
-        x = torch.tensor(np.array(raw_data) / 127.5 - 1, dtype=torch.float).to(device)
-        viewdiff_x = torch.tensor(np.array(viewdiff_data) / 127.5 - 1, dtype=torch.float).to(device)
-        latentdiff_x = torch.tensor(np.array(latentdiff_data) / 127.5 - 1, dtype=torch.float).to(device)
-        
-        z_v_mu, z_v_sigma, z_l, latent_embed_loss_1, latent_encoding_indices = self.encode(x)
-        _, _,  shuffled_z_l, latent_embed_loss_2, _ = self.encode(viewdiff_x)
-        shuffled_z_v_mu, shuffled_z_v_sigma, _, _, _ = self.encode(latentdiff_x)
-        
-        z_v_dist = torch.distributions.Normal(z_v_mu, z_v_sigma)
-        z_v = z_v_dist.rsample()
-        shuffled_z_v_dist = torch.distributions.Normal(shuffled_z_v_mu, shuffled_z_v_sigma)
-        shuffled_z_v = shuffled_z_v_dist.rsample()
-        
-        xrec = self.decode(z_v, z_l)
-        shuffled_xrec_l = self.decode(z_v, shuffled_z_l)
-        shuffled_xrec_v = self.decode(shuffled_z_v, z_l)
-        shuffled_xrec_vl = self.decode(shuffled_z_v, shuffled_z_l)
-
-        rec_imgs = rearrange(xrec, 'b c h w -> c h (b w)').contiguous()
-        shuffled_rec_imgs_v = rearrange(shuffled_xrec_v, 'b c h w -> c h (b w)').contiguous()
-        shuffled_rec_imgs_l = rearrange(shuffled_xrec_l, 'b c h w -> c h (b w)').contiguous()
-        shuffled_rec_imgs_vl = rearrange(shuffled_xrec_vl, 'b c h w -> c h (b w)').contiguous()
-        origin_imgs = rearrange(x, 'b c h w -> c h (b w)').contiguous()
-        origin_imgs_viewdiff = rearrange(viewdiff_x, 'b c h w -> c h (b w)').contiguous()
-        origin_imgs_latent_diff = rearrange(latentdiff_x, 'b c h w -> c h (b w)').contiguous()
-
-        cat_imgs = torch.cat([origin_imgs, origin_imgs_viewdiff, origin_imgs_latent_diff, rec_imgs, shuffled_rec_imgs_v, shuffled_rec_imgs_l, shuffled_rec_imgs_vl], dim=-2).cpu().numpy() # (B, C, 3*H, T*W)
-        cat_imgs = ((cat_imgs + 1) * 127.5).clip(0, 255).astype(np.uint8)
-        cat_imgs = cat_imgs.transpose(1, 2, 0)
-
-        if save_dir is not None:
-            for i in range(cat_imgs.shape[0]):
-                Image.fromarray(cat_imgs[i]).save(save_dir+f'/vis_{i}.png')
-        else:
-            return cat_imgs, latent_encoding_indices.cpu().numpy() 
-        
-    @torch.no_grad()
-    def visualize_train(self, x, save_dir=None):
-        self.eval()
-        B, A, C, H, W = x.shape
-        origin_imgs = x.reshape(B * A, C, H, W)
-        z_v_mu, z_v_sigma, z_l, latent_embed_loss, latent_encoding_indices = self.encode(x.reshape(B*A, C, H, W))
-        z_v = z_v_mu.clone()
-        xrec = self.decode(z_v, z_l)
-        
-        shuffle_indices = torch.tensor(list(range(1, B)) + [0])
-        shuffled_z_v = z_v.reshape(B, A, -1)[shuffle_indices, ...].reshape(B*A, -1, z_v.shape[-1])
-        shuffled_xrec_v = self.decode(shuffled_z_v, z_l)
-        
-        shuffle_indices_l = torch.tensor(list(range(1, A)) + [0])
-        shuffled_z_l = z_l.reshape(B, A, -1)[:, shuffle_indices_l, ...].reshape(B*A, -1, z_l.shape[-1])
-        shuffled_xrec_l = self.decode(z_v, shuffled_z_l)
-        
-        shuffled_xrec_vl = self.decode(shuffled_z_v, shuffled_z_l)
-
-        rec_imgs = rearrange(xrec, 'b c h w -> c h (b w)').contiguous()
-        shuffled_rec_imgs_v = rearrange(shuffled_xrec_v, 'b c h w -> c h (b w)').contiguous()
-        shuffled_rec_imgs_l = rearrange(shuffled_xrec_l, 'b c h w -> c h (b w)').contiguous()
-        shuffled_rec_imgs_vl = rearrange(shuffled_xrec_vl, 'b c h w -> c h (b w)').contiguous()
-        origin_imgs = rearrange(origin_imgs, 'b c h w -> c h (b w)').contiguous()
-
-        cat_imgs = torch.cat([origin_imgs, rec_imgs, shuffled_rec_imgs_v, shuffled_rec_imgs_l, shuffled_rec_imgs_vl], dim=-2).cpu().numpy() # (B, C, 3*H, T*W)
-        cat_imgs = ((cat_imgs + 1) * 127.5).clip(0, 255).astype(np.uint8)
-        cat_imgs = cat_imgs.transpose(1, 2, 0)
-
-        if save_dir is not None:
-            for i in range(cat_imgs.shape[0]):
-                Image.fromarray(cat_imgs[i]).save(save_dir+f'/vis_{i}.png')
-        else:
-            return cat_imgs, latent_encoding_indices.cpu().numpy()        
+     
 
     def save_checkpoint(self, checkpoint_file):
         torch.save(self.state_dict(), checkpoint_file)

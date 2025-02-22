@@ -221,7 +221,8 @@ class MultiViewViTTrainer(BaseTrainer):
         eval_errors = []
         with torch.no_grad():
             for eval_batch in self.eval_batchs:
-                loss_dict = self.get_loss(eval_batch)
+                x = torch.tensor(eval_batch).unsqueeze(0)
+                loss_dict = self.get_loss(x)
                 eval_errors.append(loss_dict["loss"].item())
         return np.mean(eval_errors)
          
