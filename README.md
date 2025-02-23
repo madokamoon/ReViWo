@@ -41,7 +41,7 @@ python rl_main.py --env_name ${your_metaworld_env_name} --env_mode "novel" --azi
 ## 📚 Citation
 If you find our work helpful, please consider citing:
 ```bibtex
-@inproceedings{lin2025diffsplat,
+@inproceedings{pang2025reviwo,
   title={Learning View-invariant World Models for Visual Robotic Manipulation},
   author={Pang, jingcheng and Tang, nan and Li, kaiyuan, and Yu, yang},
   booktitle={International Conference on Learning Representations (ICLR)},
