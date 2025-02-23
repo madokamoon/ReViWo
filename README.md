@@ -1,4 +1,4 @@
-# Reviwo
+# [ICLR 2025] Reviwo
 
 ## 🔧 Python Environment Configuration
 1. Update the `prefix` parameter in `environment.yml`
