@@ -38,6 +38,9 @@ python rl_main.py --env_name ${your_metaworld_env_name} --env_mode "novel" --azi
 python rl_main.py --env_name ${your_metaworld_env_name} --env_mode "novel" --azimuth ${change_of_azimuth}
 ``` 
 
+## 😊 Acknowledgement
+We would like to thank the authors of [OfflineRLKit](https://github.com/yihaosun1124/OfflineRL-Kit) for their great work and generously providing source codes, which inspired our work and helped us a lot in the implementation.
+
 ## 📚 Citation
 If you find our work helpful, please consider citing:
 ```bibtex
