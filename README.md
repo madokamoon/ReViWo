@@ -1,4 +1,4 @@
-# [ICLR 2025] Reviwo
+# [ICLR 2025] Learning View-invariant World Models for Visual Robotic Manipulation
 
 ## 🔧 Python Environment Configuration
 1. Update the `prefix` parameter in `environment.yml`
