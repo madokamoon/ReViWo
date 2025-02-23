@@ -24,7 +24,7 @@ python tokenizer_main.py
 python collect_data/collect_world_model_training_data.py --env_name ${your_metaworld_env_name}
 ```
 
-2. Running COMBO with the following command. We provide three setting for evaluation:
+2. Running COMBO with the following command. We offer a self-trained checkpoint in "checkpoints/multiview_v0/model.pth" with the default model config in "configs/config.yaml". We provide three settings for evaluation:
 * Training View: 
 ```bash
 python rl_main.py --env_name ${your_metaworld_env_name} --env_mode "normal"
