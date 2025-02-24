@@ -129,18 +129,11 @@ def get_args():
         default=False,
         help="Whether we only use camera_0 traj"
         )
-
     
-    parser.add_argument("--azimuth", 
+    parser.add_argument("--camera_change", 
         type=float, 
         default=-10,
-        help="change of azimuth for env_mode: novel"
-        )
-    
-    parser.add_argument("--cip", 
-        type=float, 
-        default=-10,
-        help="change of cip for env_mode: distance, elevation"
+        help="change of camera for env_mode: distance, elevation"
         )
     
     parser.add_argument("--dir_base", 
@@ -307,13 +300,13 @@ def train(args, dataset, tokenizer):
     camera_id = 0
     camera_config = world_model_training_view_generation()[0]
     if args.env_mode == 'novel':
-        camera_config.azimuth += args.cip
+        camera_config.azimuth += args.camera_change
     elif args.env_mode == 'shake':
         camera_config.azimuth -= 5
     elif args.env_mode == 'distance':
-        camera_config.distance += args.cip
+        camera_config.distance += args.camera_change
     elif args.env_mode == 'elevation':
-        camera_config.elevation += args.cip
+        camera_config.elevation += args.camera_change
     
     gym_config = {
         'id': "mw_" + args.env_name,
@@ -384,7 +377,7 @@ def train(args, dataset, tokenizer):
     if ('log_a' not in args.dir_base) and ('log_re' not in args.dir_base):
         log_dirs = make_log_dirs(args.task, args.algo_name, args.seed, vars(args), record_params=['env_mode'], encoder_name=encoder_name, dir_base=args.dir_base)
     else:
-        log_dirs = make_log_dirs(args.task, args.algo_name, args.seed, vars(args), record_params=['env_mode', 'cip'], encoder_name=encoder_name, dir_base=args.dir_base)
+        log_dirs = make_log_dirs(args.task, args.algo_name, args.seed, vars(args), record_params=['env_mode', 'camera_change'], encoder_name=encoder_name, dir_base=args.dir_base)
     # key: output file name, value: output handler type
     output_config = {
         "consoleout_backup": "stdout",

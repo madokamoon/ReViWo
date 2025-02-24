@@ -31,11 +31,11 @@ python rl_main.py --env_name ${your_metaworld_env_name} --env_mode "normal"
 ``` 
 * Novel View(CIP): 
 ```bash
-python rl_main.py --env_name ${your_metaworld_env_name} --env_mode "novel" --azimuth ${change_of_azimuth}
+python rl_main.py --env_name ${your_metaworld_env_name} --env_mode "novel" --camera_change ${change_of_azimuth}
 ``` 
 * Shaking View(CSH): 
 ```bash
-python rl_main.py --env_name ${your_metaworld_env_name} --env_mode "novel" --azimuth ${change_of_azimuth}
+python rl_main.py --env_name ${your_metaworld_env_name} --env_mode "shake"
 ``` 
 
 ## 😊 Acknowledgement
