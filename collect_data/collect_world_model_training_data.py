@@ -5,6 +5,7 @@ import os
 import pickle
 import gymnasium as gym
 import sys
+project_dir = str(os.path.dirname(os.path.dirname(__file__)))
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 from utils.collect_expert_dataset import collect_single_view_episode as collect_episode
 from gymnasium.envs import register
@@ -28,8 +29,8 @@ def get_args():
     parser.add_argument("--random_expert_epoch", type=int, default=100)
     parser.add_argument("--gaussian_expert_epoch", type=int, default=100)
     parser.add_argument("--epsilon", type=float, default=0.1, help="magnitude of gaussian noise.")
-    parser.add_argument("--log_path", type=str, default="/home/tangnan/projects/llm_reward/logs", help="output path")
-    parser.add_argument("--save_trajectory_path", type=str, default="/home/pangjc/tangn/multi_view/data/world_model_training", help="output path")
+    parser.add_argument("--log_path", type=str, default=project_dir + "/logs", help="output path")
+    parser.add_argument("--save_trajectory_path", type=str, default=project_dir + "/data/world_model_training", help="output path")
     
     parser.add_argument("--start_idx", default=0, type=int)
     parser.add_argument("--end_idx", default=50, type=int)
