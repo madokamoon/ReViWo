@@ -46,15 +46,15 @@ If you find our work helpful, please consider citing:
 ```bibtex
 @inproceedings{pang2025reviwo,
   title={Learning View-invariant World Models for Visual Robotic Manipulation},
-  author={Pang, jingcheng and 
-		 Nan Tang and 
-		 kaiyuan Li and 
-		 Yuting Tang and 
-		 Xin-Qiang Cai and 
-		 Zhen-Yu Zhang and 
-		 Gang Niu and 
-		 Sugiyama Masashi and 
-		 Yang Yu},
+  author={Jing-Cheng Pang and 
+	  Nan Tang and 
+	  kaiyuan Li and 
+	  Yuting Tang and 
+	  Xin-Qiang Cai and 
+	  Zhen-Yu Zhang and 
+	  Gang Niu and 
+	  Sugiyama Masashi and 
+	  Yang Yu},
   booktitle={International Conference on Learning Representations (ICLR)},
   year={2025}
 }
