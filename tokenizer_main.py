@@ -47,8 +47,9 @@ def train(config,
     train_func(config, logger)
     
 
-def main(training_style: str):  
-    configs = yaml.safe_load(
+def main(training_style: str): 
+    myyaml = yaml.YAML(typ='safe', pure=True)
+    configs = myyaml.load(
         (Path(project_dir + "/configs") / "config.yaml").read_text()
     )
     config_name = "defaults"

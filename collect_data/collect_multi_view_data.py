@@ -2,6 +2,9 @@ import metaworld
 import numpy as np
 import argparse
 import os
+# 修改
+os.environ["PYOPENGL_PLATFORM"] = "egl"
+os.environ["MUJOCO_GL"] = "egl"
 import pickle
 import gymnasium as gym
 import sys

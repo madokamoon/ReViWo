@@ -44,7 +44,9 @@ class SawyerEnv4CLIP(gym.Env):
         self.use_camera = use_camera
         if self.use_camera:
             os.environ['MKL_SERVICE_FORCE_INTEL'] = '1'
-            os.environ['MUJOCO_GL'] = 'osmesa'
+            # os.environ['MUJOCO_GL'] = 'oeglsmesa'
+            # 修改
+            os.environ['MUJOCO_GL'] = 'egl'
             self._env = ALL_V2_ENVIRONMENTS[env_name](render_mode='rgb_array')        
             # self.set_render_config()  
             self.save_demo_path = save_demo_path
